@@ -18,31 +18,42 @@ function updateDescription(pokemon) {
     document.getElementById('number').textContent = '#' + pokemonNumber;
 
     //TODO: Call the getName() function to and assign it to the name variable.
-    let name = 'MissingNo';
+    let name = pokemon.getName();
     document.getElementById('name').textContent = name;
     
     //TODO: Get and assign the front sprite, back sprite, and cry links.
-    let backSprite = 'media/missingno_back.png';
-    let frontSprite = 'media/missingno_front.png'
-    let cry = 'media/missingno.ogg'
+    let backSprite = pokemon.getBackSprite();
+    let frontSprite = pokemon.getFrontSprite();
+    let cry = pokemon.getCry();
 
     document.getElementById("back_sprite").src = backSprite;
     document.getElementById("front_sprite").src = frontSprite;
     document.getElementById('cry').src = cry;
 
     //TODO: Get and assign the height and weight values. Be sure to check the units!
-    let height = 3;
-    let weight = 1590;
+    let height = pokemon.getHeight() / 10;
+    let weight = pokemon.getWeight() / 10;
     document.getElementById('height').textContent = 'Height: ' + height + 'm';
     document.getElementById('weight').textContent = 'Weight: ' + weight + 'kg';
 
     //TODO: Get and assign the value for type1, and type2 if it exists.
-    let type1 = 'unknown';
-    document.getElementById('type1').textContent = type1;
-    document.getElementById('type1').classList.add(type1, 'badge');
+    let type1 = pokemon.getType1();
+    let type1El = document.getElementById('type1');
+    type1El.textContent = type1;
+    type1El.className = type1 + ' badge';
+
+    let type2 = pokemon.getType2();
+    let type2El = document.getElementById('type2');
+    if (type2) {
+        type2El.textContent = type2;
+        type2El.className = type2 + ' badge';
+    } else {
+        type2El.textContent = '';
+        type2El.className = '';
+    }
 
     //TODO: Get and assign the pokedex text description.
-    let pokedexDescription = 'MissingNO appears as a bug in the original pokemon games. We\'ll fix it here!'
+    let pokedexDescription = pokemon.getPokedexDescription();
     document.getElementById('description').textContent = pokedexDescription;
 }
 
@@ -52,8 +63,8 @@ async function updateNavigation(pokemon) {
 
     //TODO: Set the id numbers for the next and previous pokemon.
     //For example, Ivysaur (#2) is the pokemon after Bulbasaur (#1).
-    let previousPokemonNumber = pokemonNumber;
-    let nextPokemonNumber = pokemonNumber;
+    let previousPokemonNumber = pokemonNumber - 1;
+    let nextPokemonNumber = pokemonNumber + 1;
     //Creates new instances of the Pokemon class for the previous and next pokemon.
     //You do not need to edit these lines.
     let previousPokemon = new Pokemon(previousPokemonNumber);
@@ -64,18 +75,32 @@ async function updateNavigation(pokemon) {
     //TODO: Get and assign the front sprites, links, and names for the current, next, and previous pokemon.
     //TODO: Add an if statement to only display the next pokemon if the pokemon number is under 151 (E.g., Mew has no "next" pokemon).
     //TODO: Add an if statement to only display the previous pokemon if the pokemon number is over 1 (E.g., Bulbasaur has no "previous" pokemon).
-    let currentPokemonSprite = 'media/missingno_front.png';
-    let previousPokemonSprite = 'media/missingno_front.png';
-    let nextPokemonSprite = 'media/missingno_front.png';
-    let previousPokemonName = 'MissingNo';
-    let nextPokemonName = 'MissingNo';
+    let currentPokemonSprite = pokemon.getFrontSprite();
     document.getElementById('current_pokemon_img').src = currentPokemonSprite;
-    document.getElementById('previous_pokemon').href = './pokedex.html?number=' + previousPokemonNumber;
-    document.getElementById('previous_pokemon_img').src = previousPokemonSprite;
-    document.getElementById('previous_pokemon_name').textContent = '#' + previousPokemonName;
-    document.getElementById('next_pokemon').href = './pokedex.html?number=' + nextPokemonNumber;
-    document.getElementById('next_pokemon_img').src = nextPokemonSprite;
-    document.getElementById('next_pokemon_name').textContent = '#' + nextPokemonName;
+
+    let previousLink = document.getElementById('previous_pokemon');
+    if (pokemonNumber > 1) {
+        let previousPokemonSprite = previousPokemon.getFrontSprite();
+        let previousPokemonName = previousPokemon.getName();
+        previousLink.href = './pokedex.html?number=' + previousPokemonNumber;
+        document.getElementById('previous_pokemon_img').src = previousPokemonSprite;
+        document.getElementById('previous_pokemon_name').textContent = previousPokemonName;
+        previousLink.style.display = '';
+    } else {
+        previousLink.style.display = 'none';
+    }
+
+    let nextLink = document.getElementById('next_pokemon');
+    if (pokemonNumber < 151) {
+        let nextPokemonSprite = nextPokemon.getFrontSprite();
+        let nextPokemonName = nextPokemon.getName();
+        nextLink.href = './pokedex.html?number=' + nextPokemonNumber;
+        document.getElementById('next_pokemon_img').src = nextPokemonSprite;
+        document.getElementById('next_pokemon_name').textContent = nextPokemonName;
+        nextLink.style.display = '';
+    } else {
+        nextLink.style.display = 'none';
+    }
 }
 
 //Part 2a: Call methods of the Pokemon class to display the stats of the pokemon.
