@@ -84,7 +84,8 @@ async function updateNavigation(pokemon) {
         let previousPokemonName = previousPokemon.getName();
         previousLink.href = './pokedex.html?number=' + previousPokemonNumber;
         document.getElementById('previous_pokemon_img').src = previousPokemonSprite;
-        document.getElementById('previous_pokemon_name').textContent = previousPokemonName;
+        document.getElementById('previous_pokemon_name').textContent =
+            '#' + String(previousPokemonNumber).padStart(3, '0') + ' ' + previousPokemonName;
         previousLink.style.display = '';
     } else {
         previousLink.style.display = 'none';
@@ -96,22 +97,33 @@ async function updateNavigation(pokemon) {
         let nextPokemonName = nextPokemon.getName();
         nextLink.href = './pokedex.html?number=' + nextPokemonNumber;
         document.getElementById('next_pokemon_img').src = nextPokemonSprite;
-        document.getElementById('next_pokemon_name').textContent = nextPokemonName;
+        document.getElementById('next_pokemon_name').textContent =
+            '#' + String(nextPokemonNumber).padStart(3, '0') + ' ' + nextPokemonName;
         nextLink.style.display = '';
     } else {
         nextLink.style.display = 'none';
     }
 }
 
+//Formats ids like "special-attack" into "Special Attack".
+function formatString(str) {
+    return String(str)
+        .replace(/[-_]+/g, ' ')
+        .split(' ')
+        .filter(Boolean)
+        .map(w => w[0].toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ');
+} 
+
 //Part 2a: Call methods of the Pokemon class to display the stats of the pokemon.
 function updateStats(pokemon) {
     //TODO: Get and assign the stats of the pokemon.
-    let hpStat = 178;
-    let attackStat = 19;
-    let defenseStat = 11;
-    let specialAttackStat = 23;
-    let specialDefenseStat = 23;
-    let speedStat = 0;
+    let hpStat = pokemon.getHp();
+    let attackStat = pokemon.getAttack();
+    let defenseStat = pokemon.getDefense();
+    let specialAttackStat = pokemon.getSpecialAttack();
+    let specialDefenseStat = pokemon.getSpecialDefense();
+    let speedStat = pokemon.getSpeed();
     //Calls the updateStat helper function.
     updateStat('hp', hpStat);
     updateStat('attack', attackStat);
@@ -125,13 +137,19 @@ function updateStats(pokemon) {
 function updateStat(statId, statValue) {
     let el = document.getElementById(statId);
     el.ariaValueNow = statValue;
+    el.setAttribute('aria-valuenow', String(statValue));
     el.textContent = formatString(statId) + ': ' + statValue;
     //TODO: Read up on Bootstrap's progress bar to learn what CSS properties are used for customizing the bar's width and color.
     //https://getbootstrap.com/docs/5.3/components/progress/
     //Then, use DOM manipulation to update those styles.
     //https://www.w3schools.com/jsref/prop_html_style.asp
     //The getColorFromPercent() function in utility.js can help map stat values to colors.
-    
+
+    let pct = statValue / 255;
+    pct = Math.max(0, Math.min(1, pct));
+
+    el.style.width = (pct * 100) + '%';
+    el.style.backgroundColor = getColorFromPercent(pct).toString();
 }
 
 //Part 2b: Call methods of the Pokemon class to display the level up moves of the pokemon.
@@ -139,10 +157,12 @@ function updateMoves(pokemon) {
     let moveTable = document.getElementById('move-table');
     //TODO: Get the move names and levels for the level up moves.
     //Use a for loop to loop over these arrays, calling addMove for each move.
-    //These lines show how the addMove function is called, and can be removed.
-    addMove(moveTable, 1, 'Water Gun');
-    addMove(moveTable, 1, 'Water Gun');
-    addMove(moveTable, 1, 'Sky Attack');
+    let moveNames = pokemon.getLevelUpMoveNames();
+    let moveLevels = pokemon.getLevelUpMoveLevels();
+
+    for (let i = 0; i < moveNames.length; i++) {
+        addMove(moveTable, moveLevels[i], moveNames[i]);
+    }
 }
 
 //A helper function for adding moves to the move table.
