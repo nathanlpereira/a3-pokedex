@@ -69,26 +69,42 @@ async function updateSearchResults() {
         //For case-insensitive search, consider using toLowerCase to convert both the pokemon name and search box text.
         //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase
         //If a pokemon's name is not included in the text entered, hide the pokemon.
+        let nameMatches = p.getName().toLowerCase().includes(search.toLowerCase());
 
         //TODO: Use an if statement(s) to check if the checkboxes for the pokemon's type(s) are checked.
         //If a pokemon has two types, and either is unchecked, hide the pokemon.
+        let type1 = p.getType1();
+        let type2 = p.getType2();
+        let type1Checked = document.getElementById(type1 + 'Checkbox').checked;
+        let typesMatch = type1Checked;
+        if (type2) {
+            let type2Checked = document.getElementById(type2 + 'Checkbox').checked;
+            typesMatch = type1Checked && type2Checked;
+        }
 
         //TODO: If the pokemon matches the search text and types checked, show the pokemon.
         //Also, update the total number of searched for pokemon.
-        
+        if (nameMatches && typesMatch) {
+            showPokemon(p);
+            searchedForPokemon++;
+        } else {
+            hidePokemon(p);
+        }
     }
+
+    document.getElementById('number_pokemon').textContent = searchedForPokemon;
 }
 
 //Part 3: A helper function for showing a particular pokemon.
 function showPokemon(pokemon) {
     let pokemonDOMId = pokemon.getId();
     //TODO: Find the pokemon in the DOM. Show it by removing the "hide" CSS property, if it exists.
-
+    document.getElementById(pokemonDOMId).classList.remove('hide');
 }
 
 //Part 3: A helper function for hiding a particular pokemon.
 function hidePokemon(pokemon) {
     let pokemonDOMId = pokemon.getId();
     //TODO: Find the pokemon in the DOM. Hide it by adding the "hide" CSS property, if it does not already exist.
-
+    document.getElementById(pokemonDOMId).classList.add('hide');
 }
